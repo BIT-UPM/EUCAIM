@@ -12,4 +12,7 @@ This repository contains the Docker build contexts and documentation for the fol
 - **[Brain Glioma Segmenter](./EUCAIM_brain_glioma_segmenter)**
 - **[Sub-Saharan Africa Brain Glioma Segmenter](./EUCAIM_sub_saharan_africa_brain_glioma_segmenter)**
 
+This repository contains also the Docker build contexts and documentation for the harmonization tool:
+- **[NestedComBat Harmonization](./EUCAIM_nestedcombat_harmonization)**
+
 Each folder contains the `Dockerfile` and specific instructions for that tool.
