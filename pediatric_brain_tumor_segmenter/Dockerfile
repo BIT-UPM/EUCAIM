@@ -4,7 +4,7 @@ FROM aparida12/brats2025:peds
 LABEL org.opencontainers.image.title="Pediatric Brain Tumor Segmenter"
 LABEL org.opencontainers.image.description="Inference engine for Pediatric Brain MRI Segmentation (BraTS 2025)"
 LABEL org.opencontainers.image.authors="Universidad Politécnica de Madrid & Children's National Hospital Team"
-LABEL org.opencontainers.image.source="https://github.com/Pediatric-Accelerated-Intelligence-Lab/BraTS2024-PEDS"
+LABEL org.opencontainers.image.source="https://github.com/BIT-UPM/EUCAIM/tree/main/pediatric_brain_tumor_segmenter"
 LABEL org.opencontainers.image.licenses="MIT"
 LABEL org.opencontainers.image.version="1.0.0"
 LABEL org.opencontainers.image.vendor="EUCAIM"

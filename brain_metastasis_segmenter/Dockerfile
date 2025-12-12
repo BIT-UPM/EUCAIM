@@ -4,7 +4,7 @@ FROM aparida12/brats2025:met
 LABEL org.opencontainers.image.title="Brain Metastasis Segmenter"
 LABEL org.opencontainers.image.description="Inference engine for Brain Metastasis MRI Segmentation (BraTS 2025)"
 LABEL org.opencontainers.image.authors="Universidad Politécnica de Madrid & Children's National Hospital Team"
-LABEL org.opencontainers.image.source="https://github.com/Pediatric-Accelerated-Intelligence-Lab/BraTS2025"
+LABEL org.opencontainers.image.source="https://github.com/BIT-UPM/EUCAIM/tree/main/brain_metastasis_segmenter"
 LABEL org.opencontainers.image.licenses="MIT"
 LABEL org.opencontainers.image.version="1.0.0"
 LABEL org.opencontainers.image.vendor="EUCAIM"
