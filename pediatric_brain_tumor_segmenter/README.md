@@ -10,6 +10,7 @@ The inference engine is dockerized to allow for a plug and play approach for seg
 ### For EUCAIM Users:
 
 1. Make sure you have Docker installed (version 25 or higher).
+
 2. Log in to the EUCAIM Harbor registry using your user credentials (retrieved from your user profile in the registry):
 
     ```bash
