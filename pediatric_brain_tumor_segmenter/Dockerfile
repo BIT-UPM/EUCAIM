@@ -24,6 +24,7 @@ USER appuser
 
 ENV LANG=C.UTF-8
 ENV PYTHONPATH=/project
+ENV PYTHONUNBUFFERED=1
 
 # Entrypoint
 CMD ["python", "runner.py", "-i", "/input", "-o", "/output", "-t", "PED"]

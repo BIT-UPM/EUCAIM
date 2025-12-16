@@ -45,44 +45,52 @@ input_folder/
 
 Once the docker image is pulled, you must first perform a **one-time setup** to download the necessary model weights, and then you can run the inference.
 
+### Setup Prerequisites
+
+Before running the container for the first time, you **must** create the directories for weights and output on the host machine and ensure they are writable by all users (the container's `appuser` cannot write to directories owned by `root`).
+
+1. **Create and Set Permissions for Checkpoints and Output:**
+
+    ```bash
+    mkdir -p checkpoints output_dir
+    chmod 777 checkpoints output_dir
+    ```
+
+    > **IMPORTANT:** If you encounter a `Permission denied` error on `chmod 777 output_dir` or `checkpoints`, the directory was incorrectly created by `root` (e.g., in a previous failed run). You must delete the folder (`sudo rm -rf <folder>`) and then re-run the `mkdir` command above to ensure your host user owns it, which is essential for running this tool without `sudo`.
+
 ### Step 1: One-Time Weight Download and Setup
 
 The model weights must be downloaded to a persistent location that the container can access. This step requires **internet access** and is performed once.
 
-1. **Create a persistent directory** for the weights on your host machine and ensure it is writable by the container's non-root user:
-
-    ```bash
-    mkdir -p $(pwd)/eucaim_weights
-    chmod 777 $(pwd)/eucaim_weights
-    ```
-
-2. **Run the container with network enabled** (`--network=bridge` or simply omitting `--network none`) and mount the writable directory to the expected location (`/mlcube_inferer/checkpoints/`):
+1. **Run the container with network enabled** (`--network=bridge` or simply omitting `--network none`) and mount the writable directories. Use your pre-created folders for the mounts:
 
     ```bash
     docker run --rm --gpus=all --memory=16G --shm-size 4G \
-        -v $(pwd)/eucaim_weights:/mlcube_inferer/checkpoints/:rw \
-        -v <inpdir>:/input/:ro -v <outdir>:/output/:rw \
+        -v $(pwd)/checkpoints:/mlcube_inferer/checkpoints/:rw \
+        -v $(pwd)/input_dir:/input/:ro \
+        -v $(pwd)/output_dir:/output/:rw \
         harbor.eucaim.cancerimage.eu/processing-tools/brain-glioma-segmenter:v1.0.0
     ```
 
-    *This will download the `all_weights.zip` file into the local `eucaim_weights` folder and then likely fail the segmentation due to missing input, but the necessary weights are now saved.*
+    *This will download the weights into the local `checkpoints` folder.*
 
 ### Step 2: Running Inference (Offline)
 
-For subsequent and actual inference runs, you can now use the original command with the required `--network none` flag, mounting the **pre-downloaded** weights.
+For subsequent and actual inference runs, you can now use the original command with the required `--network none` flag, mounting the **pre-downloaded** weights and ensuring absolute paths are used for input/output.
 
 ```bash
 docker run --rm --network none --gpus=all --memory=16G --shm-size 4G \
-        -v $(pwd)/eucaim_weights:/mlcube_inferer/checkpoints/:ro \
-        -v <inpdir>:/input/:ro -v <outdir>:/output/:rw \
+        -v $(pwd)/checkpoints:/mlcube_inferer/checkpoints/:ro \
+        -v $(pwd)/input_dir:/input/:ro \
+        -v $(pwd)/output_dir:/output/:rw \
         harbor.eucaim.cancerimage.eu/processing-tools/brain-glioma-segmenter:v1.0.0
 ```
 
 where:
 
-- `<inpdir>` is the directory with all input MRI NifTi files (extn .nii.gz; .nii will be ignored) that need to be segmented.
-- `<outdir>` is the directory where all outputs are stored (`<inpdir>` should not be `<outdir>`).
-- **`$(pwd)/eucaim_weights`** is the persistent folder created in Step 1 containing the downloaded model weights. Note that the mount is now **read-only** (`:ro`) for the official inference run.
+- **`$(pwd)/input_dir`** is the absolute path to your input data directory.
+- **`$(pwd)/output_dir`** is the absolute path to your output directory.
+- **`$(pwd)/checkpoints`** is the persistent folder containing the downloaded model weights. Note the checkpoint mount is now **read-only** (`:ro`) for the official inference run.
 
 ## Citations
 

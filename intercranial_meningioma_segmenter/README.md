@@ -43,17 +43,36 @@ input_folder/
 
 ## **Usage**
 
-Once the docker image is pulled, you can simply run the segmentation:
+Once the docker image is pulled, you must first perform a **one-time setup** to ensure the output directory has the correct permissions, and then you can run the inference.
+
+### Setup Prerequisites
+
+Before running the container, you **must** create the directory for the output on the host machine and ensure it is writable by all users (the container's `appuser` cannot write to directories owned by `root`).
+
+1. **Create and Set Permissions for Output:**
+
+    ```bash
+    mkdir -p output_dir
+    chmod 777 output_dir
+    ```
+
+    > **IMPORTANT:** If you encounter a `Permission denied` error on `chmod 777 output_dir`, the directory was incorrectly created by `root` (e.g., in a previous failed run). You must delete the folder (`sudo rm -rf <folder>`) and then re-run the `mkdir` command above to ensure your host user owns it, which is essential for running this tool without `sudo`.
+
+### Running Inference
+
+You can now run the inference using the command below, ensuring absolute paths are used for input/output.
 
 ```bash
 docker run --rm --network none --gpus=all --memory=16G --shm-size 4G \
-        -v <inpdir>:/input/:ro -v <outdir>:/output/:rw \
+        -v $(pwd)/input_dir:/input/:ro \
+        -v $(pwd)/output_dir:/output/:rw \
         harbor.eucaim.cancerimage.eu/processing-tools/intracranial-meningioma-segmenter:v1.0.0
 ```
 
 where:
-- `<inpdir>` is the directory with all input MRI NifTi files (extn .nii.gz; .nii will be ignored) that need to be segmented.
-- `<outdir>` is the directory where all outputs are stored (`<inpdir>` should not be `<outdir>`).
+
+- **`$(pwd)/input_dir`** is the absolute path to your input data directory.
+- **`$(pwd)/output_dir`** is the absolute path to your output directory.
 
 ## Citations
 
