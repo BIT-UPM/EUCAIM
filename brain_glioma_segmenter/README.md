@@ -43,17 +43,46 @@ input_folder/
 
 ## **Usage**
 
-Once the docker image is pulled, you can simply run the segmentation:
+Once the docker image is pulled, you must first perform a **one-time setup** to download the necessary model weights, and then you can run the inference.
+
+### Step 1: One-Time Weight Download and Setup
+
+The model weights must be downloaded to a persistent location that the container can access. This step requires **internet access** and is performed once.
+
+1. **Create a persistent directory** for the weights on your host machine and ensure it is writable by the container's non-root user:
+
+    ```bash
+    mkdir -p $(pwd)/eucaim_weights
+    chmod 777 $(pwd)/eucaim_weights
+    ```
+
+2. **Run the container with network enabled** (`--network=bridge` or simply omitting `--network none`) and mount the writable directory to the expected location (`/mlcube_inferer/checkpoints/`):
+
+    ```bash
+    docker run --rm --gpus=all --memory=16G --shm-size 4G \
+        -v $(pwd)/eucaim_weights:/mlcube_inferer/checkpoints/:rw \
+        -v <inpdir>:/input/:ro -v <outdir>:/output/:rw \
+        harbor.eucaim.cancerimage.eu/processing-tools/brain-glioma-segmenter:v1.0.0
+    ```
+
+    *This will download the `all_weights.zip` file into the local `eucaim_weights` folder and then likely fail the segmentation due to missing input, but the necessary weights are now saved.*
+
+### Step 2: Running Inference (Offline)
+
+For subsequent and actual inference runs, you can now use the original command with the required `--network none` flag, mounting the **pre-downloaded** weights.
 
 ```bash
 docker run --rm --network none --gpus=all --memory=16G --shm-size 4G \
+        -v $(pwd)/eucaim_weights:/mlcube_inferer/checkpoints/:ro \
         -v <inpdir>:/input/:ro -v <outdir>:/output/:rw \
         harbor.eucaim.cancerimage.eu/processing-tools/brain-glioma-segmenter:v1.0.0
 ```
 
 where:
+
 - `<inpdir>` is the directory with all input MRI NifTi files (extn .nii.gz; .nii will be ignored) that need to be segmented.
 - `<outdir>` is the directory where all outputs are stored (`<inpdir>` should not be `<outdir>`).
+- **`$(pwd)/eucaim_weights`** is the persistent folder created in Step 1 containing the downloaded model weights. Note that the mount is now **read-only** (`:ro`) for the official inference run.
 
 ## Citations
 
